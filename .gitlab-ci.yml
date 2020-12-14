@@ -1,0 +1,243 @@
+# saas前端项目的gitlab-ci的模板文件
+
+stages:
+  - Build
+  - deploy
+
+#before_script:
+#  - PROD_VERSION=`cat version`
+  
+variables:
+  ALIYUN_REGISTRY: registry-vpc.cn-hangzhou.aliyuncs.com
+  REGISTRY_NAME_SPECE: ybt_service
+  IMAGE_FULL_NAME: $ALIYUN_REGISTRY/$REGISTRY_NAME_SPECE/$CI_PROJECT_NAME
+  main_project_name: Saas
+  oss_path: oss://ycb51-bucket/frontend/$main_project_name/$CI_PROJECT_NAME/
+  uat_oss_path: oss://ycb51-bucket/frontend/Saas_uat/$CI_PROJECT_NAME/
+
+
+################################################### 测试环境 #######################################################
+#Build test:
+#  stage: Build
+#  script:
+#    - cnpm i
+#    - cnpm run build
+#    - tar zcf $CI_PROJECT_NAME.tar.gz.dev dist
+#    - ossutil64 cp $CI_PROJECT_NAME.tar.gz.dev $oss_path -u
+#    - tower-cli job launch --job-template=47 --extra-vars="project_name=$CI_PROJECT_NAME main_project_name=$main_project_name version=dev" --monitor
+#  only:
+#    refs:
+#      - test
+#  except:
+#    changes:
+#      - .gitlab-ci.yml
+#  tags:
+#    - ci
+
+#################################################k8s测试前端测试环境################################################
+Build k8s-test:
+  stage: Build
+  script:
+    - cnpm i
+    - cnpm run build
+    - tar zcf $CI_PROJECT_NAME.tar.gz.dev dist
+    - docker build -t $IMAGE_FULL_NAME:dev .
+    - docker push $IMAGE_FULL_NAME:dev
+    - echo $IMAGE_FULL_NAME:dev
+
+  only:
+    refs:
+      - test
+  except:
+    changes:
+      - .gitlab-ci.yml
+  tags:
+    - ci
+
+  
+Deploy k8s-test:
+  stage: deploy
+  script:
+    - helm uninstall backend-page -n saas-dev
+    - helm upgrade -i backend-page /root/helm_repo/saas/backend-page -n saas-dev -f /root/helm_repo/saas/backend-page/values-dev.yaml --wait --timeout 1m30s
+  tags:
+    - kube-master1-test
+  only:
+    refs:
+      - test
+  except:
+    changes:
+      - .gitlab-ci.yml
+
+
+#################################################分期商城临时环境###################################################
+Build debug:
+  stage: Build
+  script:
+    - cnpm i
+    - cnpm run build
+    - tar zcf $CI_PROJECT_NAME.tar.gz.utest dist
+    - docker build -t $IMAGE_FULL_NAME:utest .
+    - docker push $IMAGE_FULL_NAME:utest
+    - echo $IMAGE_FULL_NAME:utest
+
+  only:
+    refs:
+      - newInstallment
+  except:
+    changes:
+      - .gitlab-ci.yml
+  tags:
+    - ci
+
+
+Deploy debug:
+  stage: deploy
+  script:
+    - helm uninstall fenqi-bk -n saas-test
+    - helm upgrade -i fenqi-bk /root/helm_repo/saas/fenqi-bk -n saas-test -f /root/helm_repo/saas/fenqi-bk/values-test.yaml --wait --timeout 1m30s
+  tags:
+    - kube-master1-test
+  only:
+    refs:
+      - newInstallment
+  except:
+    changes:
+      - .gitlab-ci.yml
+
+
+    
+Build front_vis debug:
+  stage: Build
+  script:
+    - cnpm i
+    - cnpm run build
+    - tar zcf $CI_PROJECT_NAME.tar.gz.utest dist
+    - docker build -t $IMAGE_FULL_NAME:utest .
+    - docker push $IMAGE_FULL_NAME:utest
+    - echo $IMAGE_FULL_NAME:utest
+  only:
+    refs:
+      - installment1
+  except:
+    changes:
+      - .gitlab-ci.yml
+  tags:
+    - ci
+
+
+Deploy debug2:
+  stage: deploy
+  script:
+    - helm uninstall frentend-vis -n saas-test
+    - helm upgrade -i frentend-vis /root/helm_repo/saas/frentend-vis -n saas-test -f /root/helm_repo/saas/frentend-vis/values-test.yaml --wait --timeout 1m30s
+  tags:
+    - kube-master1-test
+  only:
+    refs:
+      - installment1
+  except:
+    changes:
+      - .gitlab-ci.yml
+
+    
+################################################### 预发布环境 #######################################################
+#Build uat:
+#  stage: Build
+#  script:
+#    - cnpm i
+#    - cnpm run build
+#    - tar zcf $CI_PROJECT_NAME.tar.gz.$version dist
+#    - ossutil64 cp $CI_PROJECT_NAME.tar.gz.$version $uat_oss_path -u
+#    - tower-cli job launch --job-template=48 --extra-vars="project_name=$CI_PROJECT_NAME main_project_name=Saas_uat version=$version" --monitor
+#  only:
+#    refs:
+#      - uat
+#  except:
+#    changes:
+#      - .gitlab-ci.yml
+#  tags:
+#    - ci
+Build uat:
+  stage: Build
+  script:
+    - cnpm i
+    - cnpm run build
+    - tar zcf $CI_PROJECT_NAME.tar.gz.uat dist
+    - docker build -t $IMAGE_FULL_NAME:uat .
+    - docker push $IMAGE_FULL_NAME:uat
+    - echo $IMAGE_FULL_NAME:uat
+
+  only:
+    refs:
+      - uat
+  except:
+    changes:
+      - .gitlab-ci.yml
+  tags:
+    - ci
+
+
+Deploy uat:
+  stage: deploy
+  script:
+    - helm uninstall backend-page-u -n saas-prod
+    - helm upgrade -i backend-page-u /root/helm_repo/saas/backend-page -n saas-prod -f /root/helm_repo/saas/backend-page/values-uat.yaml --wait --timeout 1m30s
+  tags:
+    - kube-master1-test
+  only:
+    refs:
+      - uat
+  except:
+    changes:
+      - .gitlab-ci.yml
+
+################################################### 线上环境 #######################################################
+#Build prod:
+#  stage: Build
+#  script:
+#    - cnpm i
+#    - cnpm run build
+#    - tar zcf $CI_PROJECT_NAME.tar.gz.$version dist
+#    - ossutil64 cp $CI_PROJECT_NAME.tar.gz.$version $oss_path -u
+#    - tower-cli job launch --job-template=48 --extra-vars="project_name=$CI_PROJECT_NAME main_project_name=$main_project_name #version=$version" --monitor
+#  only:
+#    refs:
+#      - master
+#  tags:
+#    - ci
+#  when: manual
+Build prod:
+  stage: Build
+  script:
+    - cnpm i
+    - cnpm run build
+    - tar zcf $CI_PROJECT_NAME.tar.gz.v1.0.0 dist
+    - docker build -t $IMAGE_FULL_NAME:v1.0.0 .
+    - docker push $IMAGE_FULL_NAME:v1.0.0
+    - echo $IMAGE_FULL_NAME:v1.0.0
+  tags:
+    - ci
+  only:
+    refs:
+      - master
+  except:
+    changes:
+      - .gitlab-ci.yml
+
+  
+Deploy pord:
+  stage: deploy
+  script:
+#    - sed -i "s/^appVersion:.*/appVersion:\ $PROD_VERSION/g" /root/helm_repo/saas/backend-page/Chart.yaml
+#    - sed -i "s/^tag:.*/tag:\ $PROD_VERSION/g" /root/helm_repo/saas/backend-page/values-prod.yaml
+    - helm uninstall backend-page -n saas-prod
+    - helm upgrade -i backend-page /root/helm_repo/saas/backend-page -n saas-prod -f /root/helm_repo/saas/backend-page/values-prod.yaml --wait --timeout 1m30s
+  tags:
+    - kube-master1-test
+  only:
+    refs:
+      - master
+  except:
+    changes:
+      - .gitlab-ci.yml

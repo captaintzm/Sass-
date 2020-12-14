@@ -1,0 +1,11 @@
+.el-cascader-menu {
+    overflow-x: hidden !important;
+}
+
+.el-menu-item:focus{
+    background:linear-gradient(90deg, rgba(0, 107, 230, 1) 0%, rgba(0, 107, 230, 0.4) 100%) !important;
+    color:#ffffff !important;
+}
+.el-checkbox-group .el-checkbox{
+    margin-left: 30px;
+}

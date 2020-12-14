@@ -1,0 +1,192 @@
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+p,
+th,
+td {
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+fieldset,
+img {
+    border: 0;
+}
+
+/* address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+    font-style: normal;
+    font-weight: normal;
+} */
+
+ol,
+ul {
+    list-style: none;
+}
+
+th {
+    text-align: left;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: 100%;
+    font-weight: normal;
+}
+
+q:before,
+q:after {
+    content: ' '
+}
+
+abbr,
+acronym {
+    border: 0;
+}
+
+i {
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+}
+
+.clearfloat:after {
+    display: block;
+    clear: both;
+    content: "";
+    visibility: hidden;
+    height: 0
+}
+
+.mt20{
+    margin-top: 20px;
+}
+.mb20 {
+    margin-bottom: 20px;
+}
+
+.w60 {
+    width: 60px;
+}
+
+.w90 {
+    width: 90px;
+}
+
+.w120 {
+    width: 120px;
+}
+
+.w140 {
+    width: 140px !important;
+}
+
+.w150 {
+    width: 150px;
+}
+
+.w210 {
+    width: 210px;
+}
+.w300{
+    width: 300px;
+}
+.ml0 {
+    margin-left: 0 !important;
+}
+
+.ml10 {
+    margin-left: 10px !important;
+}
+
+.color1 {
+    color: red
+}
+
+.color2 {
+    color: #999999;
+}
+
+.formItem {
+    display: inline-block;
+}
+
+.textRight {
+    text-align: right;
+}
+
+.el-dialog__title {
+    font-size: 14px;
+}
+
+.el-loading-mask {
+    z-index: 3;
+}
+
+.formItem {
+    display: inline-block;
+}
+.tip_icon {
+    margin: 0 5px;
+    position: relative;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background: url("../img/icon11.png") no-repeat;
+    background-size: contain;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.tip_icon .tip {
+    display: none;
+    padding: 5px;
+    position: absolute;
+    top: 3px;
+    left: 25px;
+    min-width: 230px;
+    line-height: 20px;
+    font-size: 12px;
+    color: #999;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 5px;
+    box-sizing: border-box;
+    z-index: 9;
+}
+.tip_icon:hover .tip{
+     display: block;
+}
